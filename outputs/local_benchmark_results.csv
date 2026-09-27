@@ -1,0 +1,6 @@
+Giai đoạn (Stage),Thời gian (s)
+Stage 1: Preprocessing & Load,1.9791
+Stage 2: Feature Extraction (HOG),6.3118
+Stage 3: Model Training (Linear SVM),13.5949
+Stage 4: Test Inference (Batch),0.0126
+Stage 5: Save Artifact,0.0028

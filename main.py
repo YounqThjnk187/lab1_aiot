@@ -1,5 +1,8 @@
+import os
 import json
 import joblib
+from pathlib import Path
+from sklearn.metrics import accuracy_score, f1_score
 from src.prepare_data import crop_and_convert_vnts, group_split_data
 from src.features import extract_hog_features
 from src.train_eval import train_and_eval_all, plot_and_save_cm
@@ -33,10 +36,21 @@ def main():
 
     print("\n=== BƯỚC 4: ĐÁNH GIÁ MÔ HÌNH TỐT NHẤT TRÊN TEST SET ===")
     y_test_pred = best_model.predict(X_test)
+    
+    test_acc = accuracy_score(y_test, y_test_pred)
+    test_f1 = f1_score(y_test, y_test_pred, average='macro')
+    print(f"KẾT QUẢ TẬP TEST ({best_name}):")
+    print(f"  - Test Accuracy : {test_acc * 100:.2f}%")
+    print(f"  - Test Macro F1 : {test_f1:.4f}")
+
     labels = sorted(list(set(y_train)))
     plot_and_save_cm(y_test, y_test_pred, labels)
 
     print("\n=== BƯỚC 5: LƯU MODEL VÀ CONFIG ===")
+    # Tự động tạo các thư mục đầu ra nếu chưa tồn tại
+    os.makedirs("models", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
+
     joblib.dump(best_model, "models/best_model.joblib")
     config = {
         "input_width": 48,
@@ -48,6 +62,9 @@ def main():
     }
     with open("models/config.json", "w") as f:
         json.dump(config, f, indent=4)
+        
+    print("✓ Đã lưu mô hình thành công vào: models/best_model.joblib")
+    print("✓ Đã lưu cấu hình thành công vào: models/config.json")
     print("Đã hoàn tất lưu vết pipeline!")
 
 if __name__ == "__main__":
